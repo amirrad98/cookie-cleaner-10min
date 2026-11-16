@@ -1,0 +1,63 @@
+name: Publish release ZIP
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - cookie-cleaner-10min.zip
+      - .github/workflows/release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cookie-cleaner-release
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release files
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify ZIP against its release tag
+        id: package
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          import zipfile
+          from pathlib import Path
+
+          with zipfile.ZipFile("cookie-cleaner-10min.zip") as package:
+              expected_files = {"manifest.json", "background.js"}
+              if set(package.namelist()) != expected_files or package.testzip():
+                  raise SystemExit("The ZIP must contain only the two extension files at its root.")
+              version = json.loads(package.read("manifest.json"))["version"]
+              if not re.fullmatch(r"[0-9]+(?:\.[0-9]+){0,3}", version):
+                  raise SystemExit("Invalid extension version.")
+              tag = f"v{version}"
+              for name in sorted(expected_files):
+                  released = subprocess.check_output(["git", "show", f"{tag}:{name}"])
+                  if package.read(name) != released:
+                      raise SystemExit(f"{name} differs from the {tag} release source.")
+
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
+              output.write(f"tag={tag}\n")
+          print(f"Verified extension package against {tag}.")
+          PY
+
+      - name: Attach ZIP to the published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.package.outputs.tag }}
+        run: gh release upload "$RELEASE_TAG" cookie-cleaner-10min.zip
