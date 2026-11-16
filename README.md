@@ -2,16 +2,25 @@
 
 A small Manifest V3 extension that automatically clears website cookies approximately every 10 minutes. Requires desktop Chromium or Google Chrome **111 or newer**.
 
-## Install
+## Install directly from the ZIP
 
-1. Download the extension ZIP from the [latest release](https://github.com/amirrad98/cookie-cleaner-10min/releases/latest).
-2. Extract the ZIP into a folder you will keep on your computer.
-3. Open `chrome://extensions` in the browser profile you want to clean.
-4. Turn on **Developer mode**.
-5. Click **Load unpacked** and select the extracted folder containing `manifest.json`.
-6. Leave the extension enabled. The first cleanup is scheduled for approximately 10 minutes after installation.
+**[Download cookie-cleaner-10min.zip](https://github.com/amirrad98/cookie-cleaner-10min/raw/refs/heads/main/cookie-cleaner-10min.zip)**
 
-You can also download or clone this repository and load its root folder using the same steps. No build or package installation is required.
+1. Save the ZIP linked above to your computer.
+2. Open `chrome://extensions` in the browser profile you want to clean.
+3. Turn on **Developer mode**.
+4. Drag the downloaded **cookie-cleaner-10min.zip** file from Finder or File Explorer directly onto the Extensions page.
+5. Leave the extension enabled. The first cleanup is scheduled for approximately 10 minutes after installation.
+
+Chromium extracts the ZIP into its profile and loads the extension automatically. You do not need to unzip it yourself. Drag the saved file, not the download hyperlink. This installation method requires a browser that permits developer extensions.
+
+The finished ZIP contains `manifest.json` and `background.js` directly at the top level. GitHub's automatic **Source code (zip)** and **Code > Download ZIP** downloads contain a wrapper folder, so use the finished ZIP linked above for direct installation.
+
+### Loading a source folder
+
+If you prefer to work with the source, clone or extract this repository, click **Load unpacked**, and select the folder with `manifest.json` directly inside it. Selecting your home folder (`~`), a parent folder, or a ZIP with this button causes a missing-manifest error.
+
+No build or package installation is required.
 
 ## Version 1.0.0 behavior
 
@@ -31,7 +40,7 @@ Cleanup requires the browser to be running. Browser alarms can be delayed, so th
 
 To stop future cleanups, disable or remove the extension at `chrome://extensions`.
 
-To change the interval, edit `INTERVAL_MINUTES` in `background.js`, save the file, and click the extension's **Reload** button at `chrome://extensions`.
+To change the interval, load a source folder as described above, edit `INTERVAL_MINUTES` in its `background.js`, save the file, and click the extension's **Reload** button at `chrome://extensions`. ZIP installation uses the browser's extracted copy.
 
 ## Privacy and permissions
 
@@ -46,6 +55,8 @@ No host permissions are requested. The complete implementation is in `manifest.j
 
 ## Official documentation
 
+- [Chromium ZIP installer](https://chromium.googlesource.com/chromium/src/+/HEAD/extensions/browser/zipfile_installer.cc)
+- [Chromium extension drag-and-drop handler](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/browser/resources/extensions/drag_and_drop_handler.ts)
 - [Load an unpacked extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
 - [Alarms API and timing behavior](https://developer.chrome.com/docs/extensions/reference/api/alarms)
 - [Browsing Data API and cookie removal](https://developer.chrome.com/docs/extensions/reference/api/browsingData)
