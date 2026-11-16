@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>Cookie Remover</title>
+    <link rel="stylesheet" href="popup.css">
+    <script type="module" src="popup.js"></script>
+  </head>
+  <body>
+    <main>
+      <header class="heading">
+        <span class="mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M27 17.3A11.2 11.2 0 1 1 14.7 5a5.3 5.3 0 0 0 6 6 5.3 5.3 0 0 0 6.3 6.3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <circle cx="11" cy="13" r="1.5" fill="currentColor"/>
+            <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+            <circle cx="10.5" cy="21" r="1.5" fill="currentColor"/>
+          </svg>
+        </span>
+        <div>
+          <h1>Cookie Remover</h1>
+          <p class="subtitle">Automatic cookie cleanup</p>
+        </div>
+      </header>
+
+      <form id="interval-form" novalidate aria-busy="true">
+        <fieldset id="interval-controls" disabled>
+          <label for="interval">Remove cookies every <span class="visually-hidden">(minutes)</span></label>
+          <div class="interval-field">
+            <input id="interval" name="interval" type="number" min="1" max="1440" step="1" value="10" inputmode="numeric" required aria-describedby="interval-hint feedback">
+            <span class="unit" aria-hidden="true">minutes</span>
+          </div>
+          <p class="hint" id="interval-hint">1 to 1,440 minutes, up to 24 hours.</p>
+          <button id="save-button" type="submit">Save interval</button>
+        </fieldset>
+        <p id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true">Loading your settings…</p>
+      </form>
+
+      <dl class="schedule" aria-live="polite" aria-atomic="true">
+        <div>
+          <dt>Next cleanup</dt>
+          <dd><time id="next-run">Loading…</time><span class="approximate">Approximate time</span></dd>
+        </div>
+      </dl>
+
+      <footer>Clearing cookies can sign you out of websites.</footer>
+    </main>
+  </body>
+</html>

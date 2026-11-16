@@ -1,0 +1,238 @@
+:root {
+  color-scheme: light dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  color: #25282d;
+  background: #ffffff;
+  --muted: #646b75;
+  --line: #e4e6e9;
+  --field-line: #b8bec7;
+  --mark-bg: #f3f4f6;
+  --button-bg: #272b31;
+  --button-hover: #111419;
+  --button-text: #ffffff;
+  --focus: #3268bd;
+  --error: #b3261e;
+  --success: #246544;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 360px;
+  margin: 0;
+}
+
+main {
+  padding: 22px;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.mark {
+  display: grid;
+  flex: 0 0 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--mark-bg);
+}
+
+.mark svg {
+  width: 29px;
+  height: 29px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.35px;
+  line-height: 1.3;
+}
+
+.subtitle {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.interval-field {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  border: 1px solid var(--field-line);
+  border-radius: 7px;
+}
+
+.interval-field:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.interval-field:has(input[aria-invalid="true"]) {
+  border-color: var(--error);
+}
+
+input {
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0 12px;
+  border: 0;
+  border-radius: inherit;
+  outline: none;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  padding: 0 12px 0 6px;
+  color: var(--muted);
+}
+
+.hint {
+  margin: 8px 0 18px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+button {
+  width: 100%;
+  min-height: 41px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--button-text);
+  background: var(--button-bg);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover:enabled {
+  background: var(--button-hover);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+fieldset:disabled input,
+fieldset:disabled button {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.feedback {
+  min-height: 35px;
+  margin: 10px 0 15px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.feedback[data-state="error"] {
+  color: var(--error);
+}
+
+.feedback[data-state="saved"] {
+  color: var(--success);
+}
+
+.schedule {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.schedule > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+dt {
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+dd {
+  margin: 0;
+  text-align: right;
+}
+
+time {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+
+.approximate {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+footer {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #eceef2;
+    background: #202226;
+    --muted: #abb1bb;
+    --line: #3b3f46;
+    --field-line: #686f7a;
+    --mark-bg: #2b2e34;
+    --button-bg: #e5e8ed;
+    --button-hover: #ffffff;
+    --button-text: #202226;
+    --focus: #87b5ff;
+    --error: #ffb4ab;
+    --success: #93d4ae;
+  }
+}

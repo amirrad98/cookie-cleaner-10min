@@ -1,10 +1,18 @@
-name: Publish release ZIP
+name: Publish Cookie Remover
 
 on:
   push:
     branches: [main]
     paths:
+      - manifest.json
+      - background.js
+      - scheduler.js
+      - settings.js
+      - popup.*
+      - cookie-remover.zip
       - cookie-cleaner-10min.zip
+      - scripts/package.py
+      - test/**
       - .github/workflows/release.yml
   workflow_dispatch:
 
@@ -12,20 +20,26 @@ permissions:
   contents: write
 
 concurrency:
-  group: cookie-cleaner-release
+  group: cookie-remover-release
   cancel-in-progress: false
 
 jobs:
-  upload:
+  publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out release files
+      - name: Check out extension files
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Verify ZIP against its release tag
+      - name: Test settings and scheduling
+        run: npm test
+
+      - name: Verify finished ZIPs
+        run: python3 scripts/package.py --check
+
+      - name: Read extension version
         id: package
         shell: bash
         run: |
@@ -33,31 +47,29 @@ jobs:
           import json
           import os
           import re
-          import subprocess
-          import zipfile
           from pathlib import Path
 
-          with zipfile.ZipFile("cookie-cleaner-10min.zip") as package:
-              expected_files = {"manifest.json", "background.js"}
-              if set(package.namelist()) != expected_files or package.testzip():
-                  raise SystemExit("The ZIP must contain only the two extension files at its root.")
-              version = json.loads(package.read("manifest.json"))["version"]
-              if not re.fullmatch(r"[0-9]+(?:\.[0-9]+){0,3}", version):
-                  raise SystemExit("Invalid extension version.")
-              tag = f"v{version}"
-              for name in sorted(expected_files):
-                  released = subprocess.check_output(["git", "show", f"{tag}:{name}"])
-                  if package.read(name) != released:
-                      raise SystemExit(f"{name} differs from the {tag} release source.")
-
+          version = json.loads(Path("manifest.json").read_text())["version"]
+          if not re.fullmatch(r"[0-9]+(?:\.[0-9]+){0,3}", version):
+              raise SystemExit("Invalid extension version.")
           with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
-              output.write(f"tag={tag}\n")
-          print(f"Verified extension package against {tag}.")
+              output.write(f"tag=v{version}\n")
           PY
 
-      - name: Attach ZIP to the published release
+      - name: Publish version and attach ZIP
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ steps.package.outputs.tag }}
-        run: gh release upload "$RELEASE_TAG" cookie-cleaner-10min.zip
+        shell: bash
+        run: |
+          if git show-ref --verify --quiet "refs/tags/$RELEASE_TAG"; then
+            python3 scripts/package.py --check --verify-tag "$RELEASE_TAG"
+          fi
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --target "$GITHUB_SHA" \
+              --title "Cookie Remover $RELEASE_TAG" \
+              --notes-file RELEASE_NOTES.md
+          fi
+          gh release upload "$RELEASE_TAG" cookie-remover.zip --clobber

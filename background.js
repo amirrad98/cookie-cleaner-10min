@@ -1,26 +1,38 @@
-const ALARM_NAME = "clear-all-website-cookies";
-const INTERVAL_MINUTES = 10;
+import { createScheduler } from "./scheduler.js";
+import { ALARM_NAME } from "./settings.js";
 
-async function ensureAlarm() {
-  const alarm = await chrome.alarms.get(ALARM_NAME);
+const scheduler = createScheduler(chrome);
 
-  // Keep an existing schedule when the service worker wakes up.
-  if (!alarm || alarm.periodInMinutes !== INTERVAL_MINUTES) {
-    await chrome.alarms.create(ALARM_NAME, {
-      delayInMinutes: INTERVAL_MINUTES,
-      periodInMinutes: INTERVAL_MINUTES
-    });
-  }
-}
-
-function startSchedule() {
-  ensureAlarm().catch((error) => {
-    console.error("Could not schedule cookie clearing:", error);
+function maintainSchedule() {
+  scheduler.getSettings().catch((error) => {
+    console.error("Cookie Remover could not restore its schedule:", error);
   });
 }
 
-chrome.runtime.onInstalled.addListener(startSchedule);
-chrome.runtime.onStartup.addListener(startSchedule);
+// Register listeners synchronously so service-worker wakeups cannot miss them.
+chrome.runtime.onInstalled.addListener(maintainSchedule);
+chrome.runtime.onStartup.addListener(maintainSchedule);
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type !== "get-settings" && message?.type !== "set-interval") {
+    return false;
+  }
+
+  const operation = message.type === "get-settings"
+    ? scheduler.getSettings()
+    : scheduler.setInterval(message.intervalMinutes);
+
+  operation.then(
+    (settings) => sendResponse({ ok: true, ...settings }),
+    (error) => sendResponse({
+      ok: false,
+      error: error instanceof Error ? error.message : "Could not save your interval. Please try again."
+    })
+  );
+
+  // Chrome 111 requires the callback form for asynchronous message responses.
+  return true;
+});
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name !== ALARM_NAME) return;
@@ -32,9 +44,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
       protectedWeb: true
     }
   }).catch((error) => {
-    console.error("Could not clear cookies:", error);
+    console.error("Cookie Remover could not remove cookies:", error);
   });
 });
 
-// Recreate the alarm if a browser restart or extension reload removed it.
-startSchedule();
+maintainSchedule();

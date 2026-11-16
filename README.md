@@ -1,63 +1,68 @@
-# Cookie Cleaner Every 10 Minutes
+# Cookie Remover
 
-A small Manifest V3 extension that automatically clears website cookies approximately every 10 minutes. Requires desktop Chromium or Google Chrome **111 or newer**.
+A small Chromium extension that removes website cookies at an interval you choose. Requires desktop Chromium or Google Chrome **111 or newer**.
 
-## Install directly from the ZIP
+**[Download Cookie Remover](https://github.com/amirrad98/cookie-cleaner-10min/releases/latest/download/cookie-remover.zip)** · [Releases](https://github.com/amirrad98/cookie-cleaner-10min/releases)
 
-**[Download cookie-cleaner-10min.zip](https://github.com/amirrad98/cookie-cleaner-10min/raw/refs/heads/main/cookie-cleaner-10min.zip)**
+## Install from the ZIP
 
-1. Save the ZIP linked above to your computer.
-2. Open `chrome://extensions` in the browser profile you want to clean.
-3. Turn on **Developer mode**.
-4. Drag the downloaded **cookie-cleaner-10min.zip** file from Finder or File Explorer directly onto the Extensions page.
-5. Leave the extension enabled. The first cleanup is scheduled for approximately 10 minutes after installation.
+1. Download **cookie-remover.zip**.
+2. Open `chrome://extensions` and turn on **Developer mode**.
+3. Drag the downloaded ZIP from Finder or File Explorer directly onto that page.
+4. Open the browser's Extensions menu and click **Cookie Remover**. Pin it if you want the button on your toolbar.
 
-Chromium extracts the ZIP into its profile and loads the extension automatically. You do not need to unzip it yourself. Drag the saved file, not the download hyperlink. This installation method requires a browser that permits developer extensions.
+Chromium handles extraction. Use the finished ZIP above, which has `manifest.json` at its root. GitHub's automatic source archive has an extra folder and is intended for source browsing or manual extraction.
 
-The finished ZIP contains `manifest.json` and `background.js` directly at the top level. GitHub's automatic **Source code (zip)** and **Code > Download ZIP** downloads contain a wrapper folder, so use the finished ZIP linked above for direct installation.
+### Upgrading from the earlier cleaner
 
-### Loading a source folder
+Disable or remove **Cookie Cleaner Every 10 Minutes** before installing this ZIP. A ZIP installation can create a separate extension, and leaving the earlier copy enabled would keep its old timer running.
 
-If you prefer to work with the source, clone or extract this repository, click **Load unpacked**, and select the folder with `manifest.json` directly inside it. Selecting your home folder (`~`), a parent folder, or a ZIP with this button causes a missing-manifest error.
+For an existing source-folder installation, replace the source files and click **Reload** at `chrome://extensions`. An in-place update preserves the existing extension identity and saved settings.
 
-No build or package installation is required.
+## Choose the cleanup interval
 
-## Version 1.0.0 behavior
+1. Click **Cookie Remover** in the Extensions menu or toolbar.
+2. Enter a whole number from **1 to 1,440 minutes** (up to 24 hours).
+3. Click **Save interval**.
 
-- Clears website cookies of all ages in the regular browser profile where it is installed, including cookies for websites installed as hosted applications.
-- Schedules another cleanup every 10 minutes using the browser's alarms API.
-- Preserves the existing schedule when its background service worker wakes up. If the alarm is missing after a restart or reload, it creates a new schedule with a 10-minute delay.
-- Leaves history, saved passwords, cache, local storage, and IndexedDB untouched.
-- Does not run in Incognito mode or affect other browser profiles.
+The default is **10 minutes**. Saving starts a fresh countdown using your chosen interval. The popup shows the approximate next cleanup time and confirms when your setting has been saved.
 
-**Clearing login cookies can sign you out of websites and reset cookie-based preferences.** In Google Chrome, clearing the Sync account cookie can also pause Sync. Open websites can create new cookies immediately after a cleanup.
+The setting is stored locally and survives browser restarts and worker shutdowns. Opening the popup leaves a matching timer unchanged. If the browser loses the alarm, Cookie Remover restores it using your saved interval. Uninstalling the extension removes its saved settings.
 
-## Timing
+## Behavior
 
-Cleanup requires the browser to be running. Browser alarms can be delayed, so the interval is approximate. Alarms cannot wake a sleeping computer. After the computer wakes, a missed repeating alarm fires at most once and the interval resumes from that point.
+- Removes website cookies of all ages in the regular profile where it is installed, including cookies belonging to installed hosted website apps.
+- Preserves browser history, saved passwords, cache, local storage, and IndexedDB.
+- Does not operate in Incognito or other browser profiles.
+- Runs approximately at the chosen interval while the browser is running. Sleep and browser scheduling can delay a cleanup.
+- To stop future cleanups, disable the extension at `chrome://extensions`.
 
-## Stop or change the interval
-
-To stop future cleanups, disable or remove the extension at `chrome://extensions`.
-
-To change the interval, load a source folder as described above, edit `INTERVAL_MINUTES` in its `background.js`, save the file, and click the extension's **Reload** button at `chrome://extensions`. ZIP installation uses the browser's extracted copy.
+**Removing login cookies can sign you out of websites and reset cookie-based preferences.** In Google Chrome, removing the Sync account cookie can also pause Sync. Open websites may immediately set new cookies.
 
 ## Privacy and permissions
 
-The extension runs locally. It makes no network requests, includes no remote scripts or external packages, and does not collect or transmit cookie contents or browsing data.
+Cookie Remover runs locally. It makes no network requests and does not collect or transmit cookie contents or browsing data.
 
 | Permission | Purpose |
 | --- | --- |
 | `alarms` | Schedule recurring cleanups. |
-| `browsingData` | Delete website cookies from the current profile. |
+| `browsingData` | Remove website cookies from the current profile. |
+| `storage` | Remember your chosen interval on this device. |
 
-No host permissions are requested. The complete implementation is in `manifest.json` and `background.js`.
+No host permissions, remote scripts, or external runtime packages are used.
 
-## Official documentation
+## Development and packaging
+
+The extension has no build dependencies. To load the source, select the repository folder using **Load unpacked** at `chrome://extensions`.
+
+Run the behavioral tests with `npm test`. Build the ZIP with `npm run package`. The packaging script produces a ZIP with the extension files at its root and maintains the earlier ZIP filename for existing repository download links.
+
+The release workflow checks the behavior and package contents, creates the versioned release when needed, and attaches **cookie-remover.zip**. Existing release tags are checked before a package can be replaced.
+
+## Official references
 
 - [Chromium ZIP installer](https://chromium.googlesource.com/chromium/src/+/HEAD/extensions/browser/zipfile_installer.cc)
-- [Chromium extension drag-and-drop handler](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/browser/resources/extensions/drag_and_drop_handler.ts)
-- [Load an unpacked extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
-- [Alarms API and timing behavior](https://developer.chrome.com/docs/extensions/reference/api/alarms)
-- [Browsing Data API and cookie removal](https://developer.chrome.com/docs/extensions/reference/api/browsingData)
-- [Incognito manifest settings](https://developer.chrome.com/docs/extensions/reference/manifest/incognito)
+- [Alarms API](https://developer.chrome.com/docs/extensions/reference/api/alarms)
+- [Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)
+- [Browsing Data API](https://developer.chrome.com/docs/extensions/reference/api/browsingData)
+- [Extension message passing](https://developer.chrome.com/docs/extensions/develop/concepts/messaging)

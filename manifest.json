@@ -1,12 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "Cookie Cleaner Every 10 Minutes",
-  "version": "1.0.0",
-  "description": "Clears all website cookies in this regular browser profile approximately every 10 minutes.",
+  "name": "Cookie Remover",
+  "version": "1.1.0",
+  "description": "Automatically remove website cookies at an interval you choose.",
   "minimum_chrome_version": "111",
-  "permissions": ["alarms", "browsingData"],
+  "permissions": ["alarms", "browsingData", "storage"],
   "incognito": "not_allowed",
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Cookie Remover",
+    "default_popup": "popup.html"
   }
 }

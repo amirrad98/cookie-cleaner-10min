@@ -2,5 +2,6 @@
 Thumbs.db
 *.zip
 !cookie-cleaner-10min.zip
+!cookie-remover.zip
 *.crx
 *.pem
